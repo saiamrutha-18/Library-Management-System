@@ -1,0 +1,915 @@
+openapi: 3.0.1
+info:
+  title: Library Management System V2 API
+  description: "This is the API documentation for the Library Management System V2.\
+    \ It provides access to operations related to sections, books, and book management\
+    \ within the library."
+  version: 1.0.0
+servers:
+- url: http://127.0.0.1:5000/
+security:
+- Bearer: []
+paths:
+  /api/sections:
+    get:
+      tags:
+      - Sections
+      summary: Retrieve all sections
+      description: "This endpoint retrieves all sections in the library, including\
+        \ details like section name, description, and creation date."
+      responses:
+        "200":
+          description: Successful operation
+          content: {}
+      security:
+      - Bearer: []
+    post:
+      tags:
+      - Sections
+      summary: Create a new section
+      description: This endpoint creates a new section in the library with the specified
+        name and description.
+      requestBody:
+        description: Section data
+        content:
+          '*/*':
+            schema:
+              required:
+              - description
+              - name
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+        required: true
+      responses:
+        "201":
+          description: Section created successfully
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+  /api/sections/{section_id}:
+    put:
+      tags:
+      - Sections
+      summary: Update a section
+      description: This endpoint updates the details of an existing section specified
+        by section ID.
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              required:
+              - description
+              - name
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Section updated successfully
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - Sections
+      summary: Delete a section
+      description: This endpoint deletes a section specified by section ID from the
+        library.
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Section deleted successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/sections/{section_id}/books:
+    get:
+      tags:
+      - Books
+      summary: Retrieve all books in a section
+      description: "This endpoint retrieves all books within a specific section, identified\
+        \ by section ID."
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Operation successful
+          content: {}
+      security:
+      - Bearer: []
+    post:
+      tags:
+      - Books
+      summary: Add a new book to a section
+      description: This endpoint adds a new book to a section specified by section
+        ID.
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Book data
+        content:
+          '*/*':
+            schema:
+              required:
+              - authors
+              - content
+              - section_id
+              - title
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                authors:
+                  type: string
+                section_id:
+                  type: integer
+                  format: int64
+                rating:
+                  type: number
+                  format: float
+        required: true
+      responses:
+        "201":
+          description: Book added successfully
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+  /api/sections/{section_id}/books/{book_id}:
+    put:
+      tags:
+      - Books
+      summary: Update a book in a section
+      description: "This endpoint updates a book identified by book ID within a specific\
+        \ section, identified by section ID."
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: book_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Book data
+        content:
+          '*/*':
+            schema:
+              required:
+              - authors
+              - content
+              - title
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                title:
+                  type: string
+                content:
+                  type: string
+                authors:
+                  type: string
+                rating:
+                  type: number
+                  format: float
+        required: true
+      responses:
+        "200":
+          description: Book updated successfully
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - Books
+      summary: Delete a book from a section
+      description: "This endpoint deletes a book, specified by book ID, from a section\
+        \ identified by section ID."
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: book_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Book deleted successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/requested_books:
+    get:
+      tags:
+      - Book Requests
+      summary: List all requested books
+      description: This endpoint retrieves all books that have been requested by users
+        but not yet allocated.
+      responses:
+        "200":
+          description: List of requested books
+          content: {}
+      security:
+      - Bearer: []
+  /api/grant_book:
+    post:
+      tags:
+      - Book Management
+      summary: Grant a book to a user
+      description: Grants a requested book to a user by updating the book status and
+        issuing the book.
+      requestBody:
+        description: Grant book request data
+        content:
+          '*/*':
+            schema:
+              required:
+              - book_id
+              - user_id
+              type: object
+              properties:
+                book_id:
+                  type: integer
+                  description: The ID of the book to be granted.
+                  format: int64
+                user_id:
+                  type: string
+                  description: The ID of the user to whom the book is being granted.
+        required: true
+      responses:
+        "200":
+          description: Book granted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book granted successfully
+        "404":
+          description: Book not found or already allocated
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book not found or already allocated
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+  /api/reject_book:
+    post:
+      tags:
+      - Book Management
+      summary: Reject a book request
+      description: Rejects a book request by updating the book status to indicate
+        it is no longer requested.
+      requestBody:
+        description: Reject book request data
+        content:
+          '*/*':
+            schema:
+              required:
+              - book_id
+              - user_id
+              type: object
+              properties:
+                book_id:
+                  type: integer
+                  description: The ID of the book whose request is being rejected.
+                  format: int64
+                user_id:
+                  type: string
+                  description: The ID of the user whose book request is being rejected.
+        required: true
+      responses:
+        "200":
+          description: Book request rejected successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book request rejected successfully
+        "404":
+          description: Book not found or not eligible for rejection
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book not found or not eligible for rejection
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Missing Authorization Header
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An error occurred
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+  /api/alloc_books:
+    get:
+      tags:
+      - Book Allocation
+      summary: List all allocated books
+      description: This endpoint retrieves all books that have been allocated to users.
+      responses:
+        "200":
+          description: List of allocated books
+          content: {}
+      security:
+      - Bearer: []
+  /api/revoke_book:
+    post:
+      tags:
+      - Book Management
+      summary: Revoke access to a book
+      description: Revokes the allocated access to a book by updating the book status
+        and marking it as returned.
+      requestBody:
+        description: Revoke access request data
+        content:
+          '*/*':
+            schema:
+              required:
+              - a_id
+              - book_id
+              - user_id
+              type: object
+              properties:
+                a_id:
+                  type: integer
+                  description: The Allocation ID associated with the book status.
+                  format: int64
+                book_id:
+                  type: integer
+                  description: The ID of the book to revoke access to.
+                  format: int64
+                user_id:
+                  type: string
+                  description: The ID of the user whose access is being revoked.
+        required: true
+      responses:
+        "200":
+          description: Book revoked successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book revoked successfully
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User book record not found
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+  /api/avail_books:
+    get:
+      tags:
+      - All Books
+      summary: List all available books with section details
+      description: "Retrieves a detailed list of all books available in the library,\
+        \ including information about the section they belong to."
+      responses:
+        "200":
+          description: List of all books retrieved successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/graphs/librarian_stats:
+    get:
+      tags:
+      - Statistics
+      summary: Get library statistics
+      description: "This endpoint provides various statistics about the library, such\
+        \ as the number of books per section and the number of allocated books."
+      responses:
+        "200":
+          description: Library statistics data retrieved successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/books_by_section:
+    get:
+      tags:
+      - Books By Section (User Dashboard)
+      summary: List books by section for the current user
+      description: "This endpoint lists all books by section for the current user,\
+        \ showing their status as either Allocated, Requested, or Available for request."
+      responses:
+        "200":
+          description: Books organized by section retrieved successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/request_book/{book_id}:
+    post:
+      tags:
+      - Request Book
+      summary: Request a book
+      description: Allows a user to request a book. Users are limited to requesting
+        no more than 5 books at a time.
+      parameters:
+      - name: book_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Book request submitted successfully
+          content: {}
+        "400":
+          description: Book already requested/allocated or limit exceeded
+          content: {}
+      security:
+      - Bearer: []
+  /api/book_details/{book_id}:
+    get:
+      tags:
+      - Book Details
+      summary: Get details of a specific book
+      description: "Fetches details of a specific book including its status (Allocated,\
+        \ Requested, Available)."
+      parameters:
+      - name: book_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Book details retrieved successfully
+          content: {}
+        "404":
+          description: Book not found
+          content: {}
+      security:
+      - Bearer: []
+  /api/return_book/{book_id}:
+    post:
+      tags:
+      - Return Book
+      summary: Return a book
+      description: "Marks a book as returned by a user, updating the allocation status."
+      parameters:
+      - name: book_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Book returned successfully
+          content: {}
+        "400":
+          description: Invalid request or book not found
+          content: {}
+      security:
+      - Bearer: []
+  /api/submit_feedback:
+    post:
+      tags:
+      - Feedback
+      summary: Submit feedback for a book
+      description: Allows a user to submit feedback and a rating for a book they have
+        been issued.
+      requestBody:
+        description: Feedback submission data
+        content:
+          '*/*':
+            schema:
+              required:
+              - book_id
+              - feedback
+              - rating
+              type: object
+              properties:
+                book_id:
+                  type: integer
+                  description: The ID of the book for which feedback is being provided.
+                  format: int64
+                rating:
+                  type: integer
+                  description: The rating given to the book.
+                  format: int32
+                feedback:
+                  type: string
+                  description: The feedback text provided by the user.
+        required: true
+      responses:
+        "200":
+          description: Feedback submitted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Feedback submitted successfully!
+        "400":
+          description: Missing data
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Missing data
+        "404":
+          description: Issued book record not found
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Issued book record not found
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: body
+  /api/returned_bks:
+    get:
+      tags:
+      - Books Returned
+      summary: List all returned books for a user
+      description: "Lists all books that have been returned by the current user, including\
+        \ details like issue and return dates, ratings, and feedback."
+      responses:
+        "200":
+          description: List of returned books retrieved successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/my_books:
+    get:
+      tags:
+      - Issued Books
+      summary: List all books currently issued to a user
+      description: "Lists all books currently issued to a user, with details on the\
+        \ section name, issue and return dates."
+      responses:
+        "200":
+          description: List of issued books retrieved successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/graphs/user_stats:
+    get:
+      tags:
+      - Statistics
+      summary: Get user-specific library statistics
+      description: "This endpoint provides statistics related to a specific user's\
+        \ interactions with the library, such as number of books issued and returned."
+      responses:
+        "200":
+          description: User statistics data retrieved successfully
+          content: {}
+      security:
+      - Bearer: []
+  /api/current_user:
+    get:
+      tags:
+      - Current User
+      summary: Get current user information
+      description: Fetches the current logged-in user's information using the email
+        from the JWT identity.
+      responses:
+        "200":
+          description: Current user information retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: john_doe
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+      security:
+      - Bearer: []
+  /triger_celery_job:
+    post:
+      tags:
+      - Export CSV
+      summary: Trigger a Celery job to generate a CSV file
+      description: Trigger a background Celery job to generate a CSV file and send
+        it via email.
+      requestBody:
+        description: Email address to send the CSV file to.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: The email address to send the CSV file to.
+                  format: email
+                  example: user@example.com
+        required: true
+      responses:
+        "202":
+          description: Task successfully triggered
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  Task_ID:
+                    type: string
+                    description: The ID of the Celery task.
+                  Task_State:
+                    type: string
+                    description: The current state of the Celery task.
+                  Task_Result:
+                    type: string
+                    description: The result of the Celery task (likely null initially).
+                example:
+                  Task_ID: e3b0c44298fc1c14
+                  Task_State: PENDING
+      x-codegen-request-body-name: body
+  /status/{id}:
+    get:
+      tags:
+      - Export CSV
+      summary: Check the status of a Celery task
+      description: Retrieve the current status and result of a specific Celery task
+        using its ID.
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the Celery task.
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Task status and result
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  Task_ID:
+                    type: string
+                    description: The ID of the Celery task.
+                  Task_State:
+                    type: string
+                    description: The current state of the Celery task.
+                  Task_Result:
+                    type: string
+                    description: The result of the Celery task.
+                example:
+                  Task_ID: e3b0c44298fc1c14
+                  Task_State: SUCCESS
+                  Task_Result: CSV file generated and emailed successfully.
+components:
+  schemas:
+    User:
+      required:
+      - email
+      - user_type
+      - username
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        active:
+          type: boolean
+        fs_uniquifier:
+          type: string
+        user_type:
+          type: string
+        last_login:
+          type: string
+          format: date-time
+        API_token:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    Role:
+      required:
+      - description
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+    Section:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        description:
+          type: string
+        books:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+    Book:
+      required:
+      - authors
+      - content
+      - section_id
+      - title
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        authors:
+          type: string
+        section_id:
+          type: integer
+          format: int64
+        rating:
+          type: number
+          format: float
+    BookStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        book_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        is_allocated:
+          type: integer
+          format: int32
+        is_requested:
+          type: integer
+          format: int32
+        date_of_issue:
+          type: string
+          format: date-time
+        return_date:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+        book:
+          $ref: '#/components/schemas/Book'
+    BookIssued:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        book_id:
+          type: integer
+          format: int64
+        rating:
+          type: integer
+          format: int32
+        feedback:
+          type: string
+        returned:
+          type: integer
+          format: int32
+        date_of_issue:
+          type: string
+          format: date-time
+        return_date:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+        book:
+          $ref: '#/components/schemas/Book'
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      description: "JWT Authorization header using the Bearer scheme. Example: 'Authorization:\
+        \ Bearer {token}'"
+      name: Authorization
+      in: header
+x-original-swagger-version: "2.0"
