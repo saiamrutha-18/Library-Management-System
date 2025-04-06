@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Login Page</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #184c80;
+        }
+
+        .container {
+            max-width: 800px; 
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex; 
+        }
+
+        .form-container {
+            flex: 1;
+            padding-right: 20px; 
+        }
+
+        .image-container {
+            flex: 1; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 5px; 
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+        h2{
+            position: fixed;
+            top: 0;
+            margin-top: 40px;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 class="heading text-center"><b>Welcome to Library Management System - V2</b></h2>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="text-center mb-4">Login</h1>
+            <form id="loginForm" action="/" method="post">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="/signup">Don't have an account? SignUp</a>
+            </div>
+        </div>
+        <div class="image-container">
+            <img src="static/images/smilingbooks.png" alt="Login Image">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+            const formData = new FormData(this);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json().then(data => ({ status: response.status, body: data }))) // Parse JSON with status
+            .then(({ status, body }) => {
+                    if (status === 200) {
+                        if (body.token && body.redirect) {
+                            localStorage.setItem('token', body.token);
+                            console.log('Token stored in localStorage:', body.token);
+                            window.location.href = body.redirect;
+                        } else {
+                            console.error('Login failed: No token received');
+                        }
+                    } else {
+                        alert(body.error || 'An unknown error occurred');
+                    }
+                })
+            .catch(error => {
+                    console.error('Error during login:', error);
+                    alert('An error occurred: ' + error.message);
+                });
+        });
+
+    </script>
+</body>
+
+</html>

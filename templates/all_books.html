@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>All Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #343a40;
+        }
+        h3{
+                align-self: flex-end; 
+        }
+
+        #app3 {
+            padding: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background-color: #343a40;
+            color: #ffffff;
+            font-size: 1.2em;
+        }
+
+        .card-body ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .card-body li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body li:last-child {
+            border-bottom: none;
+        }
+
+        .btn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Books</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">User Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/user_dashboard">All Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/issued_books">Issued Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/usr_returned_books">Returned Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/usr_stats">User Stats</a>
+                    </li>
+        
+                </ul>
+                <button class="btn btn-outline-danger" id="logoutButton">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="app3" class="container mt-4">
+        <h3>Hello,{{ currentUser.username }}</h3>
+        <input type="text" v-model="searchQuery" class="form-control mb-3" placeholder="Search sections or authors">
+        
+        <div class="card mb-3" v-for="section in filteredSections" :key="section.section_name">
+            <div class="card-header">{{ section.section_name }}</div>
+            <ul class="list-group list-group-flush">
+                <li v-if="section.books.length > 0" class="list-group-item" v-for="book in section.books" :key="book.book_id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>{{ book.title }}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="text-muted">Author: {{ book.authors }}</span>
+                        </div>
+                        <div class="col-md-1">
+                            <span class="text-muted">Rating: {{ book.rating }}</span>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <button class="btn"
+                                :class="{
+                                    'btn-secondary': book.status === 'Requested',
+                                    'btn-primary': book.status === 'Request',
+                                    'btn-success': book.status === 'Allocated'
+                                }"
+                                :disabled="book.status === 'Requested'"
+                                @click="handleBookAction(book)">
+                                {{ book.status }}
+                            </button>
+                        </div>
+                    </div>
+                </li>
+                <div v-else><span>No books in this section..</span></div>
+            </ul>
+        </div>
+    </div>
+    
+
+    <script src="static\JS\all_books.js"></script>
+</body>
+</html>

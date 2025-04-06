@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Section Book Statistics</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #343a40;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            
+        }
+        .chart-container {
+            margin-bottom: 40px;
+            text-align: center; 
+            flex: 1;
+            padding: 10px;
+        }
+        .chart-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; 
+        }
+
+    canvas {
+        width: 300px;  
+        height: 300px; 
+        max-width: 100%;
+        margin: 0 auto; 
+    }
+       
+    </style>
+</head>
+<body>
+    <h1>User Statistics</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">User Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/user_dashboard">All Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/issued_books">Issued Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/usr_returned_books">Returned Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/usr_stats">User Stats</a>
+                    </li>
+                </ul>
+                <button class="btn btn-outline-danger" id="logoutButton">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div id="app14">
+        <div class="chart-wrapper">
+        <div class="chart-container">
+            <h2>Books Read by Section</h2>
+            <canvas id="booksReadChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Books Allocated and Returned by Section</h2>
+            <canvas id="booksIssuedReturnedChart"></canvas>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('logoutButton').addEventListener('click', function () {
+            localStorage.removeItem('token');
+            window.location.href = '/logout';
+        });
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    stats: []
+                };
+            },
+            methods: {
+                fetchStatistics() {
+                    const token = localStorage.getItem('token');
+                    const headers = { 'Authorization': `Bearer ${token}` };
+
+                    axios.get(`/api/graphs/user_stats`, { headers })
+                        .then(response => {
+                            this.stats = response.data.data;
+                            this.renderBooksReadChart();
+                            this.renderBooksIssuedReturnedChart();
+                        })
+                        .catch(error => console.error('Error fetching statistics:', error));
+                },
+                renderBooksReadChart() {
+                    const ctx = document.getElementById('booksReadChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: this.stats.map(s => s.section_name),
+                            datasets: [{
+                                label: 'Books Read',
+                                data: this.stats.map(s => s.books_read),
+                                backgroundColor: this.stats.map(() => `#${Math.floor(Math.random()*16777215).toString(16)}`),
+                                hoverOffset: 4
+                            }]
+                        }
+                    });
+                },
+                renderBooksIssuedReturnedChart() {
+                    const ctx = document.getElementById('booksIssuedReturnedChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: this.stats.map(s => s.section_name),
+                            datasets: [
+                                {
+                                    label: 'Books Allocated',
+                                    data: this.stats.map(s => s.books_allocated),
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                                },
+                                {
+                                    label: 'Books Returned',
+                                    data: this.stats.map(s => s.books_returned),
+                                    backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            },
+            mounted() {
+                this.fetchStatistics();
+            }
+        }).mount('#app14');
+    </script>
+</body>
+</html>
